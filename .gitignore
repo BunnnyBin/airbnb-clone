@@ -147,3 +147,4 @@ dmypy.json
 desktop.ini
 Pipfile
 Pipfile.lock
+uploads/
