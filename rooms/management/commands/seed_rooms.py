@@ -33,9 +33,9 @@ class Command(BaseCommand):
             "bedrooms": lambda x: random.randint(0, 5),
             "baths": lambda x: random.randint(0, 5),
         })
-        created_photos = seeder.execute()
-        print(list(created_photos.values()))  # 생성된 room의 pk 출력!!!
-        created_clean = flatten(list(created_photos.values()))  # flatten : 이중 리스트를 깔끔하게 벗겨주는 것
+        created = seeder.execute()
+        print(list(created.values()))  # 생성된 room의 pk 출력!!!
+        created_clean = flatten(list(created.values()))  # flatten : 이중 리스트를 깔끔하게 벗겨주는 것
         for pk in created_clean:
             room = room_models.Room.objects.get(pk=pk)
             amenities = room_models.Amenity.objects.all()
