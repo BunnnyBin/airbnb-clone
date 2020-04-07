@@ -23,7 +23,7 @@ class Command(BaseCommand):
         seeder.add_entity(room_models.Room, number, {
             # faker : seeder는 필드와 상관없이 아무관계없는 데이터를 넣지만 faker는 address,city 등에 맞춰서 데이터를 생성해준다.
             "name": lambda x: seeder.faker.address(),
-            # 랜덤 호스트, 룸타입을 뽑는 함수
+            # 랜덤 호스트, 룸타입을 뽑는 함수 - 일대다 관계
             "host": lambda x: random.choice(all_users),
             "room_type": lambda x: random.choice(room_types),
             # 점수가 음수로 나오지 않게 하는 함수
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             amenities = room_models.Amenity.objects.all()
             facilities = room_models.Facility.objects.all()
             rules = room_models.HouseRule.objects.all()
-            # Photo
+            # Photo - 여러개 생성
             for i in range(3, random.randint(10, 17)):
                 room_models.Photo.objects.create(
                     caption=seeder.faker.sentence(),
@@ -62,6 +62,5 @@ class Command(BaseCommand):
                 magic_number = random.randint(0, 15)
                 if magic_number % 2 == 0:
                     room.house_rules.add(r)
-
 
         self.stdout.write(self.style.SUCCESS(f"{number} rooms created!"))
