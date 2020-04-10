@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block page_name %}{% endblock page_name %}| Nbnb</title>
 </head>
 <body>
-&copy; Nbnb
+{% include "partial/header.html" %}
+
+{% block content %}
+{% endblock %}
+
+{% include "partial/footer.html" %}
 </body>
 </html>
