@@ -45,3 +45,9 @@ class HomeView(ListView):
 class RoomDetail(DetailView):
     # view한테 우리가 무슨 model를 원하는지 알려줘야함
     model = models.Room
+
+#room 검색바
+def search(request):
+    city = request.GET.get("city")
+    city = str.capitalize(city)
+    return render(request, "rooms/search.html", {"city":city})
