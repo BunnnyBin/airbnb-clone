@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.http import Http404
 from . import models
 
@@ -35,9 +35,13 @@ class HomeView(ListView):
         return context
 
 
-def room_detail(request, pk):
-    try:
-        room = models.Room.objects.get(pk=pk)
-        return render(request, "rooms/detail.html", {"room": room})
-    except models.Room.DoesNotExist:
-        raise Http404()
+# def room_detail(request, pk):
+#     try:
+#         room = models.Room.objects.get(pk=pk)
+#         return render(request, "rooms/detail.html", {"room": room})
+#     except models.Room.DoesNotExist:
+#         raise Http404()
+
+class RoomDetail(DetailView):
+    # view한테 우리가 무슨 model를 원하는지 알려줘야함
+    model = models.Room
