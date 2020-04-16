@@ -34,5 +34,4 @@ class HomeView(ListView):
         return context
 
 def room_detail(request, pk):
-
     return render(request, "rooms/detail.html")
