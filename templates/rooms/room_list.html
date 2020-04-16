@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-    {% for room in object_list %}
+    {{ now }}
+
+    {% for room in rooms %}
         <h3>{{ room.name }} / ${{ room.price }}</h3>
     {% endfor %}
 
