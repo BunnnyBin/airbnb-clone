@@ -54,20 +54,38 @@ def search(request):
     city = str.capitalize(city)
     country = request.GET.get("country", "KR")
     room_type = int(request.GET.get("room_type", 0))
+    price = int(request.GET.get("price", 0))
+    guests = int(request.GET.get("guests", 0))
+    bedrooms = int(request.GET.get("bedrooms", 0))
+    beds = int(request.GET.get("beds", 0))
+    baths = int(request.GET.get("baths", 0))
+    s_amenities = request.GET.get("amenities")
+    s_facilities = request.GET.get("facilities")
 
-    room_types = models.RoomType.objects.all()
-
-    #form에서 받은 값
+    # form에서 받은 값
     form = {
         "city": city,
-        "s_room_type":room_type,
-        "s_country":country,
+        "s_room_type": room_type,
+        "s_country": country,
+        "price": price,
+        "guests": guests,
+        "bedrooms": bedrooms,
+        "beds": beds,
+        "baths": baths,
+        "s_amenities":s_amenities,
+        "s_facilities":s_facilities,
     }
-    #form으로 넘기는 값
+
+    room_types = models.RoomType.objects.all()
+    amenities = models.Amenity.objects.all()
+    facilities = models.Facility.objects.all()
+
+    # form으로 넘기는 값
     choices = {
         "countries": countries,
         "room_types": room_types,
-        "countries":countries
+        "amenities":amenities,
+        "facilities":facilities,
     }
 
     return render(request,
