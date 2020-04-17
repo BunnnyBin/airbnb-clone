@@ -1,4 +1,5 @@
 from math import ceil
+from django_countries import countries
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
@@ -46,8 +47,12 @@ class RoomDetail(DetailView):
     # view한테 우리가 무슨 model를 원하는지 알려줘야함
     model = models.Room
 
-#room 검색바
+
+# room 검색바
 def search(request):
-    city = request.GET.get("city")
+    city = request.GET.get("city", "Anywhere")  # 아무것도 검색 안 할시 = Anywhere
     city = str.capitalize(city)
-    return render(request, "rooms/search.html", {"city":city})
+    room_types = models.RoomType.objects.all()
+    return render(request,
+                  "rooms/search.html",
+                  {"city": city, "countries": countries, "room_types": room_types})
