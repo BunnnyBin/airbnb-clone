@@ -74,10 +74,10 @@ def search(request):
         "bedrooms": bedrooms,
         "beds": beds,
         "baths": baths,
-        "s_amenities":s_amenities,
-        "s_facilities":s_facilities,
-        "instant" : instant,
-        "super_host" : super_host,
+        "s_amenities": s_amenities,
+        "s_facilities": s_facilities,
+        "instant": instant,
+        "super_host": super_host,
     }
 
     room_types = models.RoomType.objects.all()
@@ -88,10 +88,23 @@ def search(request):
     choices = {
         "countries": countries,
         "room_types": room_types,
-        "amenities":amenities,
-        "facilities":facilities,
+        "amenities": amenities,
+        "facilities": facilities,
     }
+
+    #조건부 필터 - 검색 결과
+    filter_args = {}
+
+    if city != "Anywhere":
+        filter_args["city__startswith"] = city
+
+    filter_args["country"] = country
+
+    if room_type != 0:
+        filter_args["room_type__pk"] = room_type
+
+    rooms = models.Room.objects.filter(**filter_args)
 
     return render(request,
                   "rooms/search.html",
-                  {**form, **choices})
+                  {**form, **choices, "rooms":rooms})
