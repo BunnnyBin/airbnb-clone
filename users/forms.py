@@ -85,9 +85,9 @@ class SignUpForm(forms.ModelForm):
 
     # ModelForm - save() override
     def save(self, *args, **kwargs):
-        username = self.cleaned_data.get("username")
+        email = self.cleaned_data.get("email")
         password = self.cleaned_data.get("password")
-        user = super.save(commit=False) # commit=False : django object는 생성하지만 데이터베이스에는 올리지 않는다.
-        user.username = username
+        user = super().save(commit=False) # commit=False : django object는 생성하지만 데이터베이스에는 올리지 않는다.
+        user.username = email
         user.set_password(password)
         user.save()
