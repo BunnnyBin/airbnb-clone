@@ -201,7 +201,7 @@ class RoomDetail(DetailView):
 
 # class 기반 view
 class SearchView(View):
-    def __get__(self, request):
+    def get(self, request):
         country = request.GET.get("country")
 
         if country:
@@ -258,11 +258,16 @@ class SearchView(View):
                 for facility in facilities:
                     filter_args["facilities"] = int(facility)
 
-                rooms = models.Room.objects.filter(**filter_args)
+                qs = models.Room.objects.filter(**filter_args).order_by("-created")
+                paginator = Paginator(qs, 10, orphans=5) # 묶음 단위
+                page = request.GET.get("page", 1) # 요구 페이지
+                rooms = paginator.get_page(page) # 묶음 단위 중에서 요구 페이지에 해당하는 부분
+
+                return render(request,
+                              "rooms/search.html",
+                              {"form": form, "rooms": rooms})
 
         else:
             form = forms.SearchForm()  # 시작 폼
 
-        return render(request,
-                      "rooms/search.html",
-                      {"form": form, "rooms": rooms})
+        return render(request, "rooms/search.html", {"form": form})
