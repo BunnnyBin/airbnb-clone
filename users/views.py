@@ -5,6 +5,7 @@ from django.views.generic import FormView
 from django.contrib.auth import authenticate, login, logout
 from . import forms
 
+
 # class LoginView(View):
 #     def get(self, request):  # function : if request.method == "GET"
 #         form = forms.LoginForm()
@@ -32,8 +33,20 @@ class LoginView(FormView):
         user = authenticate(self.request, username=email, password=password)
         if user is not None:
             login(self.request, user)
-        return super().form_valid(form) # success_url로 간다
+        return super().form_valid(form)  # success_url로 간다
+
 
 def log_out(request):
     logout(request)
     return redirect(reverse("core:home"))
+
+
+class SignUpView(FormView):
+    template_name = "users/signup.html"
+    form_class = forms.SignUpForm
+    success_url = reverse_lazy("core:home")
+    initial = {
+        'first_name': '김',
+        'last_name': '유빈',
+        'email': 'itn@naver.com'
+    }

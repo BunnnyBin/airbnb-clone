@@ -26,3 +26,27 @@ class LoginForm(forms.Form):
         except models.User.DoesNotExist:
             self.add_error("email", forms.ValidationError("User does not exist"))  # forms.add_error()
 
+class SignUpForm(forms.Form):
+    first_name = forms.CharField(max_length=80)
+    last_name = forms.CharField(max_length=80)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    password1 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+
+    # form은 clean함수를 지나칠 때마다 데이터에 추가된다.
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        try:
+            models.User.objects.get(email = email)
+            raise forms.ValidationError("User already exists with that email")
+        except models.User.DoesNotExist:
+            return email
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get("password1")
+        password = self.cleaned_data.get("password")  # password1을 clena하려고 할때 이미 password는 cleaned이다.
+
+        if password != password1:
+            raise forms.ValidationError("Password confirmation does not match")
+        else:
+            return password
