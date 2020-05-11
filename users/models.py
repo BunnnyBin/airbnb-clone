@@ -42,8 +42,16 @@ class User(AbstractUser):
     currency = models.CharField(choices=CURRENCY_CHOICES, max_length=3, null=True, blank=True, default=CURRENCY_KRW)
     superhost = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
-    email_secret = models.CharField(max_length=120, default="", blank=True) # 사람 인증을 위해 쓰는 key
+    email_secret = models.CharField(max_length=20, default="", blank=True) # 사람 인증을 위해 쓰는 key
 
     # email 인증 - 로그인, 이메일 수정 시
     def verify_email(self):
-        pass
+        if self.email_verified is False:
+            secret = uuid.uuid4().hex[:20]
+            self.email_secret = secret
+            send_mail("Verify Airbnb Account",
+                      "Verify account, this is your secret: {secret}",
+                      settings.EMAIL_FROM,
+                      [self.email],
+                      fail_silently=False)
+        return
