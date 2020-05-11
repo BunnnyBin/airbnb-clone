@@ -45,7 +45,7 @@ class User(AbstractUser):
     email_verified = models.BooleanField(default=False)
     email_secret = models.CharField(max_length=20, default="", blank=True) # 사람 인증을 위해 쓰는 key
 
-    # email 인증 - 로그인, 이메일 수정 시
+    # email 인증 보내기(email_secret 만들기)- 로그인, 이메일 수정 시
     def verify_email(self):
         if self.email_verified is False:
             secret = uuid.uuid4().hex[:20]
@@ -57,4 +57,5 @@ class User(AbstractUser):
                       [self.email],
                       fail_silently=False,
                       html_message = html_message)
+            self.save()
         return

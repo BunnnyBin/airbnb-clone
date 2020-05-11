@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView
 from django.contrib.auth import authenticate, login, logout
-from . import forms
+from . import forms, models
 
 
 # class LoginView(View):
@@ -61,3 +61,15 @@ class SignUpView(FormView):
             login(self.request, user)
         user.verify_email()
         return super().form_valid(form)
+
+def complete_verification(request, key): # url.py의 <str:key>와 일치한 이름(key)
+    try:
+        user = models.User.objects.get(email_secret = key)
+        user.email_verified = True
+        user.email_secret = "" # 인증하고 삭제하기
+        user.save()
+        #todo : add success message
+    except models.User.DoesNotExist:
+        #todo : add error message
+        pass
+    return redirect(reverse("core:home"))
