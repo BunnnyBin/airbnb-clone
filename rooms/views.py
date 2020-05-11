@@ -49,6 +49,7 @@ class RoomDetail(DetailView):
 
 
 # room 검색바 - 함수기반 view
+
 # def search(request):
 #     # city = request.GET.get("city", "Anywhere")  # 아무것도 검색 안 할시 = Anywhere
 #     # city = str.capitalize(city)
@@ -126,11 +127,11 @@ class RoomDetail(DetailView):
 #     #
 #     # if len(s_amenities) > 0:
 #     #     for s_amenity in s_amenities:
-#     #         filter_args["amenities__pk"] = int(s_amenity)
+#     #         rooms = rooms.filter(amenities__pk=int(s_amenity))
 #     #
 #     # if len(s_facilities) > 0:
 #     #     for s_facility in s_facilities:
-#     #         filter_args["facilities__pk"] = int(s_facility)
+#     #         rooms = rooms.filter(facilities__pk=int(s_facility)
 #     #
 #     # rooms = models.Room.objects.filter(**filter_args)
 #
@@ -207,7 +208,7 @@ class SearchView(View):
         if country:
             form = forms.SearchForm(request.GET)  # form 안의 데이터
             if form.is_valid():  # form안의 데이터가 에러가 없으면
-                print(form.cleaned_data)  # form의 데이터를 본다
+                #print(form.cleaned_data)  # form의 데이터를 본다 - {'city': 'Anywhere', 'country': 'KR', 'room_type': None, 'price': None, 'guests': None, 'bedrooms': None, 'beds': None,'baths': None, 'instant_book': False, 'superhost': False, 'amenities': <QuerySet [<Amenity: washing machine>, <Amenity:Balcony>, <Amenity: Bed Linen>]>, 'facilities': <QuerySet []>}
                 city = form.cleaned_data.get("city")
                 country = form.cleaned_data.get("country")
                 room_type = form.cleaned_data.get("room_type")
@@ -252,16 +253,23 @@ class SearchView(View):
                 if superhost is True:
                     filter_args["host__superhost"] = True
 
+                q_rooms = models.Room.objects.all()
+
                 for amenity in amenities:
-                    filter_args["amenities"] = int(amenity)
+                    q_rooms = q_rooms.filter(amenities__pk = amenity.pk)  # amenities : <QuerySet [<Amenity: En suite bathroom>, <Amenity: Free Parking>, <Amenity: Freezer>]>
 
                 for facility in facilities:
-                    filter_args["facilities"] = int(facility)
+                    q_rooms = q_rooms.filter(facilities__pk = facility.pk)
 
-                qs = models.Room.objects.filter(**filter_args).order_by("-created")
-                paginator = Paginator(qs, 10, orphans=5) # 묶음 단위
+                # print(request.GET) -> <QueryDict: {'city': ['Anywhere'], 'country': ['KR'], 'room_type': [''], 'price': [''], 'guests': [''], 'bedrooms': [''], 'beds': [''], 'baths': [''], 'amenities': ['3', '6', '9']}>
+                #urlencode() : string으로 암호화
+
+                #qs = models.Room.objects.filter(**filter_args).order_by("-created")
+                qs = q_rooms.filter(**filter_args).order_by("-created")
+                paginator = Paginator(qs, 10, orphans=5) # 묶음 단위/Paginator라는 객체가 생성
+                #print(paginator) -> <django.core.paginator.Paginator object at 0x000001F1A9AF3910>
                 page = request.GET.get("page", 1) # 요구 페이지
-                rooms = paginator.get_page(page) # 묶음 단위 중에서 요구 페이지에 해당하는 부분
+                rooms = paginator.get_page(page) # 페이지에 보여질 objects들을 queryset 형태로 반환
 
                 return render(request,
                               "rooms/search.html",

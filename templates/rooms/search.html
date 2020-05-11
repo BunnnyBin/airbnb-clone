@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load page_tags %}
 
 {% block page_title %}
     Search
@@ -18,4 +19,22 @@
     {% for room in rooms %}
         <h3>{{ room.name }}</h3>
     {% endfor %}
+
+    {% if rooms.has_previous %}
+        {% if "page=" in request.GET.urlencode %}
+            <a href="?{{ request.GET.urlencode|previous_page }}">Previous</a>
+        {% else %}
+            <a href="?{{ request.GET.urlencode}}&page={{ rooms.next_page_number }}">Previous</a>
+        {% endif %}
+    {% endif %}
+
+    page {{ rooms.number }} of {{ rooms.paginator.num_pages }}
+
+    {% if rooms.has_next %}
+        {% if "page=" in request.GET.urlencode %}
+            <a href="?{{ request.GET.urlencode|next_page }}">Next</a>
+        {% else %}
+            <a href="?{{ request.GET.urlencode}}&page={{ rooms.previous_page_number }}">Next</a>
+        {% endif %}
+    {% endif %}
 {% endblock %}
