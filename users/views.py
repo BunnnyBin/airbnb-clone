@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 from django.views import View
@@ -73,3 +74,11 @@ def complete_verification(request, key): # url.py의 <str:key>와 일치한 이�
         #todo : add error message
         pass
     return redirect(reverse("core:home"))
+
+def github_login(request):
+    client_id = os.environ.get("GH_ID")
+    redirect_uri = "http://127.0.0.1:8000/users/login/github/callback"
+    return redirect(f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=read:user")
+
+def github_callback(request):
+    pass
