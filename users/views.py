@@ -87,6 +87,7 @@ def github_login(request):
 class GithubException(Exception):
     pass
 
+
 def github_callback(request):
     try:
         client_id = os.environ.get("GH_ID")
@@ -95,16 +96,16 @@ def github_callback(request):
 
         if code is not None:
             # 깃허브에 requests를 보내서 access token을 얻을 것
-            result = requests.post(
+            token_request = requests.post(
                 f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
                 headers={"Accept": "application/json"})
-            result_json = result.json()
-            error = result_json.get("error", None)
+            token_json = token_request.json()
+            error = token_json.get("error", None)
 
             if error is not None:
                 raise GithubException()
             else:
-                acceess_token = result_json.get("access_token")
+                acceess_token = token_json.get("access_token")
                 # github api에 request를 보내서 user의 정보를 가져온다.
                 profile_request = requests.get("https://api.github.com/user",
                                                headers={"Authorization": f"token {acceess_token}",
@@ -115,19 +116,34 @@ def github_callback(request):
 
                 if username is not None:
                     name = profile_json.get('name')
-                    email = profile_json.get('email')
+                    email = profile_json.get('email', None)
                     bio = profile_json.get('bio')
-                    user = models.User.objects.get(email=email)
-                    if user is not None:
-                        return redirect(reverse("users:login"))  # 로그인
-                    else:  # signup이 안되어 있다면 자동으로 가입되게 하기
-                        user = models.User.objects.create(username=email, first_name=name, bio=bio, email=email)
+                    if bio is None:
+                        bio = "None"
+
+                    if email is None:  # 깃허브의 이메일을 public으로 등록하지 않은 경우
+                        raise GithubException()
+                    else:
+                        try:
+                            user = models.User.objects.get(email=email)
+                            if user.login_method != models.User.LOGIN_GITHUB:
+                                raise GithubException()  # password나 kakao로 계정있는 경우 에러
+                        except models.User.DoesNotExist:  # signup
+                            user = models.User.objects.create(
+                                email=email, first_name=name, username=email, bio=bio,
+                                login_method=models.User.LOGIN_GITHUB
+                            )
+                            user.set_unusable_password()  # Marks the user as having no password set.
+                            user.save()
+
                         login(request, user)
                         return redirect(reverse("core:home"))
+
                 else:  # 깃허브 계정이 없는 경우
                     raise GithubException()
         else:
             raise GithubException()
 
     except GithubException:
+        # todo: send error message
         return redirect(reverse("users:login"))
