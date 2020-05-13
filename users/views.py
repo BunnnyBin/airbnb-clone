@@ -84,43 +84,50 @@ def github_login(request):
         f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=read:user")
 
 
+class GithubException(Exception):
+    pass
+
 def github_callback(request):
-    client_id = os.environ.get("GH_ID")
-    client_secret = os.environ.get("GH_SECRET")
-    code = request.GET.get("code", None)
+    try:
+        client_id = os.environ.get("GH_ID")
+        client_secret = os.environ.get("GH_SECRET")
+        code = request.GET.get("code", None)
 
-    if code is not None:
-        # 깃허브에 requests를 보내서 access token을 얻을 것
-        result = requests.post(
-            f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
-            headers={"Accept": "application/json"})
-        result_json = result.json()
-        error = result_json.get("error", None)
+        if code is not None:
+            # 깃허브에 requests를 보내서 access token을 얻을 것
+            result = requests.post(
+                f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
+                headers={"Accept": "application/json"})
+            result_json = result.json()
+            error = result_json.get("error", None)
 
-        if error is not None:
-            return redirect(reverse("users:login"))
+            if error is not None:
+                raise GithubException()
+            else:
+                acceess_token = result_json.get("access_token")
+                # github api에 request를 보내서 user의 정보를 가져온다.
+                profile_request = requests.get("https://api.github.com/user",
+                                               headers={"Authorization": f"token {acceess_token}",
+                                                        "Accept": "application/json"},
+                                               )
+                profile_json = profile_request.json()
+                username = profile_json.get('login', None)
+
+                if username is not None:
+                    name = profile_json.get('name')
+                    email = profile_json.get('email')
+                    bio = profile_json.get('bio')
+                    user = models.User.objects.get(email=email)
+                    if user is not None:
+                        return redirect(reverse("users:login"))  # 로그인
+                    else:  # signup이 안되어 있다면 자동으로 가입되게 하기
+                        user = models.User.objects.create(username=email, first_name=name, bio=bio, email=email)
+                        login(request, user)
+                        return redirect(reverse("core:home"))
+                else:  # 깃허브 계정이 없는 경우
+                    raise GithubException()
         else:
-            acceess_token = result_json.get("access_token")
-            # github api에 request를 보내서 user의 정보를 가져온다.
-            profile_request = requests.get("https://api.github.com/user",
-                                       headers={"Authorization": f"token {acceess_token}",
-                                                "Accept": "application/json"},
-                                       )
-            profile_json = profile_request.json()
-            username = profile_json.get('login', None)
+            raise GithubException()
 
-            if username is not None:
-                name = profile_json.get('name')
-                email = profile_json.get('email')
-                bio = profile_json.get('bio')
-                user = models.User.objects.get(email=email)
-                if user is not None:
-                    return redirect(reverse("users:login")) # 로그인
-                else:  # signup이 안되어 있다면 자동으로 가입되게 하기
-                    user = models.User.objects.create(username=email, first_name=name, bio=bio, email=email)
-                    login(request, user)
-                    return redirect(reverse("core:home"))
-            else: # 깃허브 계정이 없는 경우
-                return redirect(reverse("users:login"))
-    else:
-        return redirect(reverse("core:home"))
+    except GithubException:
+        return redirect(reverse("users:login"))
