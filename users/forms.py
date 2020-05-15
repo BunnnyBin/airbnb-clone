@@ -1,6 +1,6 @@
 from django import forms
 from . import models
-
+from django.contrib.auth.forms import UserCreationForm
 
 class LoginForm(forms.Form):
     email = forms.EmailField()
@@ -91,3 +91,10 @@ class SignUpForm(forms.ModelForm):
         user.username = email
         user.set_password(password)
         user.save()
+
+#class SignUpForm(UserCreationForm):
+#     email = forms.EmailField()
+#
+#     class Meta:
+#         model = models.User
+#         fields = ("email",)
