@@ -10,6 +10,7 @@
     "css": "gulp"
   },
   "devDependencies": {
+    "autoprefixer": "^9.7.6",
     "gulp": "^4.0.2",
     "gulp-csso": "^4.0.1",
     "gulp-postcss": "^8.0.0",
