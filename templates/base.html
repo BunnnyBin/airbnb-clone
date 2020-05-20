@@ -7,14 +7,19 @@
     <title>{% block page_title %}{% endblock page_title %}| Nbnb</title>
     <link rel="stylesheet" href="{% static "css/styles.css" %}">
 </head>
-<body>
-<header>
+<body class="text-gray-800">
+<header class="container max-w-full flex items-center justify-between px-6 h-20 border-b border-gray-400">
+    <div class="flex items-center">
+        <a href="{% url "core:home" %}" class="mr-6">
+            <img class="w-8" src="{% static 'img/logo.jpg' %}"/>
+        </a>
+        {% block search_bar %}
+            <form method="get" action="{% url "rooms:search" %}">
+                <input class="border px-2 py-1 rounded-sm" name="city" placeholder="Search by City"/>
+            </form>
+        {% endblock %}
+    </div>
     {% include "partial/nav.html" %}
-    {% block search_bar %}
-        <form method="get" action="{% url "rooms:search" %}">
-            <input name="city" placeholder="Search by City"/>
-        </form>
-    {% endblock %}
 </header>
 
 {% block content %}
