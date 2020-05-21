@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-    {{ now }}
+    <div class="container h-50vh rounded-xl bg-gray-800 mx-auto mt-32 mb-20 bg-cover bg-center" style="background-image: url(https://images.unsplash.com/photo-1503192851959-c6da8ac80cff?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop)">
+
+    </div>
 
     {% for room in rooms %}
         <h3><a href={% url "rooms:detail" room.pk %}>{{ room.name }} / ${{ room.price }}</a></h3>
