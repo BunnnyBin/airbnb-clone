@@ -13,8 +13,8 @@
 
         <form method="POST" action="{% url "users:login" %}">
             {% csrf_token %}
-            {{ form.email }}
-            {{ form.password }}
+                {{ form.email }}
+                {{ form.password }}
             <button class="btn bg-red-500 text-white">Login</button>
         </form>
 

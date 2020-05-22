@@ -81,6 +81,14 @@ class SignUpForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder":"Password"}))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder":"Confirm Password"}))
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        try:
+            models.User.objects.get(email = email)
+            raise forms.ValidationError("User already exists with that email")
+        except models.User.DoesNotExist:
+            return email
+
     def clean_password1(self):
         password1 = self.cleaned_data.get("password1")
         password = self.cleaned_data.get("password")  # password1을 clena하려고 할때 이미 password는 cleaned이다.
