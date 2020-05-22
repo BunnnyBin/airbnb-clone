@@ -2,9 +2,10 @@ from django import forms
 from . import models
 from django.contrib.auth.forms import UserCreationForm
 
+
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"placeholder": "Email"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder": "Password"}))
 
     # def clean_email(self):  #clean_해당 필드 : 해당 필드를 정리하는 기능 -> cleaned_data 안에서 확인 가능
     #     email = self.cleaned_data.get("email")  # self.cleaned_data : login에 작성한 email, 딕셔너리 형태
@@ -70,9 +71,15 @@ class SignUpForm(forms.ModelForm):
     class Meta:
         model = models.User
         fields = ("first_name", "last_name", "email")
+        #modelform인 경우 widet 설정하는 방법
+        widgets = {
+            'first_name':forms.TextInput(attrs={"placeholder":"First Name"}),
+            'last_name': forms.TextInput(attrs={"placeholder": "Last Name"}),
+            'email': forms.EmailInput(attrs={"placeholder": "Email"}),
+        }
 
-    password = forms.CharField(widget=forms.PasswordInput)
-    password1 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder":"Password"}))
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder":"Confirm Password"}))
 
     def clean_password1(self):
         password1 = self.cleaned_data.get("password1")
@@ -87,12 +94,12 @@ class SignUpForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         email = self.cleaned_data.get("email")
         password = self.cleaned_data.get("password")
-        user = super().save(commit=False) # commit=False : django object는 생성하지만 데이터베이스에는 올리지 않는다.
+        user = super().save(commit=False)  # commit=False : django object는 생성하지만 데이터베이스에는 올리지 않는다.
         user.username = email
         user.set_password(password)
         user.save()
 
-#class SignUpForm(UserCreationForm):
+# class SignUpForm(UserCreationForm):
 #     email = forms.EmailField()
 #
 #     class Meta:
