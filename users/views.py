@@ -6,6 +6,7 @@ from django.views.generic import FormView
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
 from . import forms, models
+from django.contrib import messages
 
 
 # class LoginView(View):
@@ -200,4 +201,5 @@ def kakao_callback(request):
         login(request, user)
         return redirect(reverse("core:home"))
     except KakaoException:
+        messages.error(request, "Something went wrong")
         return redirect(reverse("users:login"))
