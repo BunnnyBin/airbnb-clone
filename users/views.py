@@ -101,7 +101,7 @@ def github_callback(request):
             error = token_json.get("error", None)
 
             if error is not None:
-                raise GithubException()
+                raise GithubException("Can't get access token")
             else:
                 acceess_token = token_json.get("access_token")
                 # github api에 request를 보내서 user의 정보를 가져온다.
@@ -120,7 +120,7 @@ def github_callback(request):
                         bio = "None"
 
                     if email is None:  # 깃허브의 이메일을 public으로 등록하지 않은 경우
-                        raise GithubException()
+                        raise GithubException(f"Please log in with {user.login_method}")
                     else:
                         try:
                             user = models.User.objects.get(email=email)
@@ -135,15 +135,16 @@ def github_callback(request):
                             user.save()
 
                         login(request, user)
+                        messages.success(request, f"Welcome back {user.first_name}")
                         return redirect(reverse("core:home"))
 
                 else:  # 깃허브 계정이 없는 경우
-                    raise GithubException()
+                    raise GithubException("Can't get your profile")
         else:
-            raise GithubException()
+            raise GithubException("Can't get code")
 
-    except GithubException:
-        # todo: send error message
+    except GithubException as e:
+        messages.error(request, e)
         return redirect(reverse("users:login"))
 
 def kakao_login(request):
@@ -166,7 +167,7 @@ def kakao_callback(request):
         token_json = token_request.json()
         error = token_json.get("error", None)
         if error is not None:
-            raise KakaoException()
+            raise KakaoException("Can't get authorization code")
         access_token = token_json.get("access_token")
 
         profile_request = requests.get("https://kapi.kakao.com/v2/user/me", headers={'Authorization':f"Bearer {access_token}"})
@@ -174,7 +175,7 @@ def kakao_callback(request):
         kakao_account = profile_json.get("kakao_account")
         email = kakao_account.get("email")
         if email is None:
-            raise KakaoException()
+            raise KakaoException("Please also give me your email")
         profile = kakao_account.get("profile")
         nickname = profile.get("nickname")
         profile_image = profile.get("profile_image_url")
@@ -182,7 +183,7 @@ def kakao_callback(request):
         try:
             user = models.User.objects.get(email=email)
             if user.login_method != models.User.LOGIN_KAKAO:
-                raise KakaoException()
+                raise KakaoException(f"Please log in with: {user.login_method}")
         except models.User.DoesNotExist: # signup
             user = models.User.objects.create(
                 email=email,
@@ -199,7 +200,8 @@ def kakao_callback(request):
                 # filefield는 알아서 저장됨
                 print(user.avatar)
         login(request, user)
+        messages.success(request, f"Welcome back {user.first_name}")
         return redirect(reverse("core:home"))
-    except KakaoException:
-        messages.error(request, "Something went wrong")
+    except KakaoException as e:
+        messages.error(request, e)
         return redirect(reverse("users:login"))
