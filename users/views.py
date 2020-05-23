@@ -217,6 +217,7 @@ class UserProfileView(DetailView):
     #     context["hello"] = "Gggg"
     #     return context
 
+#UpdateView : form의 data 넣기, 검증
 class UpdateProfileView(UpdateView):
     model = models.User
     template_name = "users/update-profile.html"
@@ -242,5 +243,22 @@ class UpdateProfileView(UpdateView):
     #     self.object.save()
     #     return super().form_valid(form)
 
+    #placeholder 변경
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["birthdate"].widget.attrs = {"placeholder":"Birthdate"}
+        form.fields["first_name"].widget.attrs = {"placeholder": "FirstName"}
+        form.fields["last_name"].widget.attrs = {"placeholder": "LastName"}
+        form.fields["gender"].widget.attrs = {"placeholder": "Gender"}
+        form.fields["bio"].widget.attrs = {"placeholder":"Bio"}
+        return form
+
 class UpdatePasswordView(PasswordChangeView):
     template_name = "users/update-password.html"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["old_password"].widget.attrs = {"placeholder": "Current Password"}
+        form.fields["new_password1"].widget.attrs = {"placeholder": "New Password"}
+        form.fields["new_password2"].widget.attrs = {"placeholder": "Confirm Password"}
+        return form
