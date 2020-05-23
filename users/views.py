@@ -39,6 +39,14 @@ class LoginView(mixins.LoggedOutOnlyView, FormView):
             login(self.request, user)
         return super().form_valid(form)  # success_url로 간다
 
+    #success_url 대신에
+    # def get_success_url(self):
+    #     next_arg = self.request.GET.get("next")
+    #     if next_arg is not None:
+    #         return next_arg
+    #     else:
+    #         return reverse("core:home")
+
 
 def log_out(request):
     messages.info(request, f"See you later")
@@ -218,7 +226,7 @@ class UserProfileView(DetailView):
     #     return context
 
 #UpdateView : form의 data 넣기, 검증
-class UpdateProfileView(SuccessMessageMixin, UpdateView):
+class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
     model = models.User
     template_name = "users/update-profile.html"
     fields = (
@@ -256,7 +264,7 @@ class UpdateProfileView(SuccessMessageMixin, UpdateView):
         form.fields["bio"].widget.attrs = {"placeholder":"Bio"}
         return form
 
-class UpdatePasswordView(SuccessMessageMixin, PasswordChangeView):
+class UpdatePasswordView(mixins.EmailLoginOnlyView, mixins.LoggedInOnlyView, SuccessMessageMixin, PasswordChangeView):
     template_name = "users/update-password.html"
 
     def get_form(self, form_class=None):
