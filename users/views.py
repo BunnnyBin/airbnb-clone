@@ -6,9 +6,9 @@ from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import FormView, DetailView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
-from . import forms, models
+from . import forms, models, mixins
 from django.contrib import messages
-
+from django.contrib.messages.views import SuccessMessageMixin
 
 # class LoginView(View):
 #     def get(self, request):  # function : if request.method == "GET"
@@ -26,7 +26,7 @@ from django.contrib import messages
 #                 return redirect(reverse("core:home")) # reverse(name) : url로 전환됨
 #         return render(request, "users/login.html", {"form":form})
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
     template_name = "users/login.html"
     form_class = forms.LoginForm
     success_url = reverse_lazy("core:home")  # 바로 실행하지 않고 필요할때 실행된다(views에서 urls이 불러지지 않으므로?)
@@ -46,7 +46,7 @@ def log_out(request):
     return redirect(reverse("core:home"))
 
 
-class SignUpView(FormView):
+class SignUpView(mixins.LoggedOutOnlyView, FormView):
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
     #form_class = UserCreationForm
@@ -218,7 +218,7 @@ class UserProfileView(DetailView):
     #     return context
 
 #UpdateView : form의 data 넣기, 검증
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(SuccessMessageMixin, UpdateView):
     model = models.User
     template_name = "users/update-profile.html"
     fields = (
@@ -231,6 +231,9 @@ class UpdateProfileView(UpdateView):
         "language",
         "currency",
     )
+
+    success_message = "Profile Update"
+
     # url로 pk를 넘기지 않으므로 필요한 객체를 가져와야 한다.
     def get_object(self, queryset=None):
         return self.request.user
@@ -253,7 +256,7 @@ class UpdateProfileView(UpdateView):
         form.fields["bio"].widget.attrs = {"placeholder":"Bio"}
         return form
 
-class UpdatePasswordView(PasswordChangeView):
+class UpdatePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = "users/update-password.html"
 
     def get_form(self, form_class=None):
@@ -262,3 +265,9 @@ class UpdatePasswordView(PasswordChangeView):
         form.fields["new_password1"].widget.attrs = {"placeholder": "New Password"}
         form.fields["new_password2"].widget.attrs = {"placeholder": "Confirm Password"}
         return form
+
+    success_message = "Password Update"
+
+    #success_url 대신에
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()
