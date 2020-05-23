@@ -2,6 +2,7 @@ import os, requests
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 from django.views import View
+from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import FormView, DetailView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
@@ -232,3 +233,14 @@ class UpdateProfileView(UpdateView):
     # url로 pk를 넘기지 않으므로 필요한 객체를 가져와야 한다.
     def get_object(self, queryset=None):
         return self.request.user
+
+    # #username = email을 넣기 위해
+    # #self == user(model)
+    # def form_valid(self, form):
+    #     email = form.cleaned_data.get("email")
+    #     self.object.username = email
+    #     self.object.save()
+    #     return super().form_valid(form)
+
+class UpdatePasswordView(PasswordChangeView):
+    template_name = "users/update-password.html"
