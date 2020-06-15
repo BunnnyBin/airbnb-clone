@@ -316,7 +316,7 @@ class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
 #RoomDetail view이지만 host만 접속가능하고 사진이 보여질 것
 class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
     model = models.Room
-    template_name = ""
+    template_name = "rooms/room_photos.html"
 
     def get_object(self, queryset=None):
         room = super().get_object(queryset=queryset)
