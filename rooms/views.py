@@ -1,4 +1,5 @@
 from math import ceil
+from django.http import Http404
 from django_countries import countries
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -6,6 +7,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, View, UpdateView
 from django.http import Http404
+from users import mixins as user_mixins
 from . import models, forms
 
 
@@ -281,8 +283,8 @@ class SearchView(View):
         return render(request, "rooms/search.html", {"form": form})
 
 #UpdateView를 사용해서 model, field, template_name만 정하면 끝
-class EditRoomView(UpdateView):
-    model = models.Room
+class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
+    model = models.Room # model == queryset, url pk와 연동됨
     template_name = "rooms/room_edit.html"
     fields = (
         "name",
@@ -303,3 +305,24 @@ class EditRoomView(UpdateView):
         "facilities",
         "house_rules",
     )
+
+    #host가 아닌 사람이 룸을 수정하는 것을 방지함
+    def get_object(self, queryset=None):
+        room = super().get_object(queryset=queryset)
+        if room.host.pk != self.request.user.pk:
+            raise Http404()
+        return room
+
+#RoomDetail view이지만 host만 접속가능하고 사진이 보여질 것
+class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
+    model = models.Room
+    template_name = ""
+
+    def get_object(self, queryset=None):
+        room = super().get_object(queryset=queryset)
+        if room.host.pk != self.request.user.pk:
+            raise Http404()
+        return room
+
+
+
