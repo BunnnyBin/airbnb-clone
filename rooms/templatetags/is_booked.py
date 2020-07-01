@@ -11,7 +11,7 @@ def is_booked(room, day):
         return
     try:
         date = datetime.datetime(year=day.year, month=day.month, day=day.number)
-        reservation_models.BookedDay.objects.get(day=date, reservation__room=room)
+        reservation_models.BookedDay.objects.get(day=date, reservation__room=room)  #__room : ForeignKey관계
         return True
     except reservation_models.BookedDay.DoesNotExist:
         return False
