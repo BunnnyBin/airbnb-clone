@@ -16,4 +16,11 @@ class SearchForm(forms.Form):
     amenities = forms.ModelMultipleChoiceField(queryset=models.Amenity.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     facilities = forms.ModelMultipleChoiceField(queryset=models.Facility.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
 
+#CreateView - default form이 room_pk가 없어서 그냥 form 지정하기 -> FormView
+class CreatePhotoForm(forms.ModelForm):
+    class Meta:
+        model = models.Photo
+        fields = ("caption", "file")
 
+    def save(self, pk, *args, **kwargs):
+        photo = super().save(commit=False)
