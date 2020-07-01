@@ -12,6 +12,9 @@ class BookedDay(models.Model):
         verbose_name = "Booked Day"
         verbose_name_plural = "Booked Days"
 
+    def __str__(self):  #for admin
+        return str(self.day)
+
 class Reservation(core_models.TimeStampedModel):
 
     STATUS_PENDING = "pending"
@@ -47,7 +50,7 @@ class Reservation(core_models.TimeStampedModel):
             start = self.check_in
             end = self.check_out
             differ = end - start
-            existing_booked_day = BookedDay.objects.filter(day__range=(start, end)).exists()  # __range
+            existing_booked_day = BookedDay.objects.filter(day__range=(start, end), reservation__room=self.room).exists()  # __range
             if not existing_booked_day:
                 super().save(*args, **kwargs) #왜냐하면 BookedDay는 Reservation를 ForeignKey로 가지므로
                 for i in range(differ.days + 1):
@@ -55,3 +58,6 @@ class Reservation(core_models.TimeStampedModel):
                     BookedDay.objects.create(day=day, reservation=self)
             return
         return super().save(*args, **kwargs)
+
+    def __str__(self):  #for admin
+        return str(self.room)
