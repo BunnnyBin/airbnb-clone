@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView, View, UpdateView
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from users import mixins as user_mixins
 from . import models, forms
 
@@ -212,7 +213,7 @@ class SearchView(View):
         if country:
             form = forms.SearchForm(request.GET)  # form 안의 데이터
             if form.is_valid():  # form안의 데이터가 에러가 없으면
-                #print(form.cleaned_data)  # form의 데이터를 본다 - {'city': 'Anywhere', 'country': 'KR', 'room_type': None, 'price': None, 'guests': None, 'bedrooms': None, 'beds': None,'baths': None, 'instant_book': False, 'superhost': False, 'amenities': <QuerySet [<Amenity: washing machine>, <Amenity:Balcony>, <Amenity: Bed Linen>]>, 'facilities': <QuerySet []>}
+                # print(form.cleaned_data)  # form의 데이터를 본다 - {'city': 'Anywhere', 'country': 'KR', 'room_type': None, 'price': None, 'guests': None, 'bedrooms': None, 'beds': None,'baths': None, 'instant_book': False, 'superhost': False, 'amenities': <QuerySet [<Amenity: washing machine>, <Amenity:Balcony>, <Amenity: Bed Linen>]>, 'facilities': <QuerySet []>}
                 city = form.cleaned_data.get("city")
                 country = form.cleaned_data.get("country")
                 room_type = form.cleaned_data.get("room_type")
@@ -260,20 +261,21 @@ class SearchView(View):
                 q_rooms = models.Room.objects.all()
 
                 for amenity in amenities:
-                    q_rooms = q_rooms.filter(amenities__pk = amenity.pk)  # amenities : <QuerySet [<Amenity: En suite bathroom>, <Amenity: Free Parking>, <Amenity: Freezer>]>
+                    q_rooms = q_rooms.filter(
+                        amenities__pk=amenity.pk)  # amenities : <QuerySet [<Amenity: En suite bathroom>, <Amenity: Free Parking>, <Amenity: Freezer>]>
 
                 for facility in facilities:
-                    q_rooms = q_rooms.filter(facilities__pk = facility.pk)
+                    q_rooms = q_rooms.filter(facilities__pk=facility.pk)
 
                 # print(request.GET) -> <QueryDict: {'city': ['Anywhere'], 'country': ['KR'], 'room_type': [''], 'price': [''], 'guests': [''], 'bedrooms': [''], 'beds': [''], 'baths': [''], 'amenities': ['3', '6', '9']}>
-                #urlencode() : string으로 암호화
+                # urlencode() : string으로 암호화
 
-                #qs = models.Room.objects.filter(**filter_args).order_by("-created")
+                # qs = models.Room.objects.filter(**filter_args).order_by("-created")
                 qs = q_rooms.filter(**filter_args).order_by("-created")
-                paginator = Paginator(qs, 10, orphans=5) # 묶음 단위/Paginator라는 객체가 생성
-                #print(paginator) -> <django.core.paginator.Paginator object at 0x000001F1A9AF3910>
-                page = request.GET.get("page", 1) # 요구 페이지
-                rooms = paginator.get_page(page) # 페이지에 보여질 objects들을 queryset 형태로 반환
+                paginator = Paginator(qs, 10, orphans=5)  # 묶음 단위/Paginator라는 객체가 생성
+                # print(paginator) -> <django.core.paginator.Paginator object at 0x000001F1A9AF3910>
+                page = request.GET.get("page", 1)  # 요구 페이지
+                rooms = paginator.get_page(page)  # 페이지에 보여질 objects들을 queryset 형태로 반환
 
                 return render(request,
                               "rooms/search.html",
@@ -284,9 +286,10 @@ class SearchView(View):
 
         return render(request, "rooms/search.html", {"form": form})
 
-#UpdateView를 사용해서 model, field, template_name만 정하면 끝
+
+# UpdateView를 사용해서 model, field, template_name만 정하면 끝
 class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
-    model = models.Room # model == queryset, url pk와 연동됨
+    model = models.Room  # model == queryset, url pk와 연동됨
     template_name = "rooms/room_edit.html"
     fields = (
         "name",
@@ -308,14 +311,15 @@ class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
         "house_rules",
     )
 
-    #host가 아닌 사람이 룸을 수정하는 것을 방지함
+    # host가 아닌 사람이 룸을 수정하는 것을 방지함
     def get_object(self, queryset=None):
         room = super().get_object(queryset=queryset)
         if room.host.pk != self.request.user.pk:
             raise Http404()
         return room
 
-#RoomDetail view이지만 host만 접속가능하고 사진이 보여질 것
+
+# RoomDetail view이지만 host만 접속가능하고 사진이 보여질 것
 class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
     model = models.Room
     template_name = "rooms/room_photos.html"
@@ -326,6 +330,7 @@ class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
             raise Http404()
         return room
 
+
 @login_required
 def delete_photo(request, room_pk, photo_pk):
     user = request.user
@@ -334,9 +339,21 @@ def delete_photo(request, room_pk, photo_pk):
         if room.host.pk != user.pk:
             messages.error(request, "Can't delete that photo")
         else:
-            models.Photo.objects.get(pk=photo_pk).delete() # delete() : 해당 queryset를 삭제
+            models.Photo.objects.get(pk=photo_pk).delete()  # delete() : 해당 queryset를 삭제
             messages.success(request, "Photo Deleted")
-        return redirect(reverse("rooms:photos", kwargs={'pk':room_pk}))
+        return redirect(reverse("rooms:photos", kwargs={'pk': room_pk}))
     except models.Room.DoesNotExist:
-        return redirect(revese("core:home"))
+        return redirect(reverse("core:home"))
 
+
+class EditPhotoView(user_mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
+    model = models.Photo
+    template_name = "rooms/photo_edit.html"
+    pk_url_kwarg = 'photo_pk'  # room_pk말고
+    fields = ("caption",)  # fields는 무조건 튜플형식
+
+    success_message = "Photo Updated"
+
+    def get_success_url(self):
+        room_pk = self.kwargs.get("room_pk")
+        return reverse("rooms:photos", kwargs={"pk": room_pk})
