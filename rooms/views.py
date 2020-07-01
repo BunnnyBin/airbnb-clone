@@ -327,6 +327,7 @@ class CreateRoomView(user_mixins.LoggedInOnlyView, FormView):
         room = form.save()
         room.host = self.request.user
         room.save()
+        form.save_m2m() #object를 database에 저장한 후에 사용할 수 있는 manytomany 관계 저장함수
         messages.success(self.request, "Room Created")
         return redirect(reverse("rooms:detail", kwargs={"pk":room.pk}))
 
