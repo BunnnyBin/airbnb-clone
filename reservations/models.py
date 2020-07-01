@@ -1,8 +1,9 @@
+import datetime
 from django.db import models
 from django.utils import timezone
 from core import models as core_models
 
-#check-in과 check-out사이의 날짜 object 생성 - Reservation만으로는 판단불가해서
+#check-in과 check-out사이의 날짜 object 생성 - Reservation만으로는 사이에 날짜를 판단불가해서
 class BookedDay(models.Model):
     day = models.DateField()
     reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE)
@@ -47,5 +48,10 @@ class Reservation(core_models.TimeStampedModel):
             end = self.check_out
             differ = end - start
             existing_booked_day = BookedDay.objects.filter(day__range=(start, end)).exists()  # __range
-            
+            if not existing_booked_day:
+                super().save(*args, **kwargs) #왜냐하면 BookedDay는 Reservation를 ForeignKey로 가지므로
+                for i in range(differ.days + 1):
+                    day = start + datetime.timedelta(days=i)
+                    BookedDay.objects.create(day=day, reservation=self)
+            return
         return super().save(*args, **kwargs)
