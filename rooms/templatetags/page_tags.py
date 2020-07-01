@@ -3,8 +3,8 @@ from django import template
 
 register = template.Library()
 
-@register.filter(name="next_page")
-def next_page(value):
+@register.filter(name="next_page") # name : 함수 이름과 다른데 호출할 때 쓰는 이름
+def next_page(value): # value : filter가 적용되는 값
     split = value.split("&")
     for s in split:
         if "page=" in s:
