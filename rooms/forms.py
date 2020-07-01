@@ -16,6 +16,35 @@ class SearchForm(forms.Form):
     amenities = forms.ModelMultipleChoiceField(queryset=models.Amenity.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     facilities = forms.ModelMultipleChoiceField(queryset=models.Facility.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
 
+#CreateView - user.pk가 없다 -> FormView
+class CreateRoomForm(forms.ModelForm):
+    class Meta:
+        model = models.Room
+        fields = (
+        "name",
+        "description",
+        "country",
+        "city",
+        "price",
+        "address",
+        "guests",
+        "beds",
+        "bedrooms",
+        "baths",
+        "check_in",
+        "check_out",
+        "instant_book",
+        "room_type",
+        "amenities",
+        "facilities",
+        "house_rules",
+        )
+
+    def save(self, *args, **kwargs):
+        room = super().save(commit=False)  #commit=False : object는 생성하지만 database에 넣지 않는다!!!!
+        return room  #form밖으로 내보낸다
+
+
 #CreateView - default form이 room_pk가 없어서 그냥 form 지정하기 -> FormView
 class CreatePhotoForm(forms.ModelForm):
     class Meta:
@@ -27,4 +56,3 @@ class CreatePhotoForm(forms.ModelForm):
         room = models.Room.objects.get(pk=pk)
         photo.room = room
         photo.save()
-

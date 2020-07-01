@@ -319,6 +319,18 @@ class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
         return room
 
 
+class CreateRoomView(user_mixins.LoggedInOnlyView, FormView):
+    form_class = forms.CreateRoomForm
+    template_name = "rooms/room_create.html"
+
+    def form_valid(self, form):
+        room = form.save()
+        room.host = self.request.user
+        room.save()
+        messages.success(self.request, "Room Created")
+        return redirect(reverse("rooms:detail", kwargs={"pk":room.pk}))
+
+
 # RoomDetail view이지만 host만 접속가능하고 사진이 보여질 것
 class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
     model = models.Room
