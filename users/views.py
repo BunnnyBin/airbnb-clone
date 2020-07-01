@@ -5,6 +5,7 @@ from django.views import View
 from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import FormView, DetailView, UpdateView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from . import forms, models, mixins
 from django.contrib import messages
@@ -39,7 +40,7 @@ class LoginView(mixins.LoggedOutOnlyView, FormView):
             login(self.request, user)
         return super().form_valid(form)  # success_url로 간다
 
-    #success_url 대신에
+    #success_url에 기능 추가할 때
     # def get_success_url(self):
     #     next_arg = self.request.GET.get("next")
     #     if next_arg is not None:
@@ -240,9 +241,9 @@ class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView
         "currency",
     )
 
-    success_message = "Profile Update"
+    success_message = "Profile Update"  #SuccessMessageMixin
 
-    # url로 pk를 넘기지 않으므로 필요한 객체를 가져와야 한다.
+    # url로 pk를 넘기지 않으므로(view에만 pk가 넘어오지 form에는 pk가 없다) 필요한 객체를 가져와야 한다.
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -276,6 +277,15 @@ class UpdatePasswordView(mixins.EmailLoginOnlyView, mixins.LoggedInOnlyView, Suc
 
     success_message = "Password Update"
 
-    #success_url 대신에
     def get_success_url(self):
         return self.request.user.get_absolute_url()
+
+#session - 추가적인 정보 넣기 (데이터베이스에 들어가지 않는 정보 - 로그아웃하면 사라짐)
+#host_session
+@login_required
+def switch_host(request):
+    try:
+        del request.session["is_hosting"]
+    except KeyError:
+        request.session["is_hosting"] = True
+    return redirect(reverse("core:home"))
