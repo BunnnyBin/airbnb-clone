@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from core import models as core_models
+from . import managers
 
 #check-in과 check-out사이의 날짜 object 생성 - Reservation만으로는 사이에 날짜를 판단불가해서
 class BookedDay(models.Model):
@@ -32,6 +33,7 @@ class Reservation(core_models.TimeStampedModel):
     check_out = models.DateField()
     guest = models.ForeignKey("users.User", related_name="reservations", on_delete=models.CASCADE)
     room = models.ForeignKey("rooms.Room", related_name="reservations", on_delete=models.CASCADE)
+    objects = managers.CustomReviewManger()
 
     def in_progress(self):
         now = timezone.now().date()
