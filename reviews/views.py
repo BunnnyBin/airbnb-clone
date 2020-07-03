@@ -24,4 +24,3 @@ def create_review(request, room):
             messages.success(request, "Room reviewed")
             return redirect(reverse("rooms:detail", kwargs={"pk":room.pk}))
 
-
