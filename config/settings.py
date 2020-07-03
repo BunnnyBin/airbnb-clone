@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -148,5 +148,5 @@ EMAIL_FROM = "puppy@sandbox543528f3a6c54c12bc21d8002c570f14.mailgun.org"
 
 LOGIN_URL = "/users/login/"
 
-LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"))
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 

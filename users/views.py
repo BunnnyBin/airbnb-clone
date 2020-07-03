@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from . import forms, models, mixins
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 
 # class LoginView(View):
 #     def get(self, request):  # function : if request.method == "GET"
@@ -289,3 +290,10 @@ def switch_host(request):
     except KeyError:
         request.session["is_hosting"] = True
     return redirect(reverse("core:home"))
+
+#translation
+def switch_language(request):
+    lang = request.GET.get("lang",None)
+    if lang is not None:
+        pass
+    return HttpResponse(status=200)

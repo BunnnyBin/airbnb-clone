@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-03 18:37+0900\n"
+"POT-Creation-Date: 2020-07-03 18:42+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,15 @@ msgstr ""
 
 #: .\templates\base.html:22
 msgid "Search by City"
-msgstr ""
+msgstr "Buscar por Ciudad"
+
+#: .\templates\partial\footer.html:5
+msgid "Please don't copy us."
+msgstr "Por favor no nos copies."
+
+#: .\templates\partial\footer.html:7
+msgid "All rights reserved"
+msgstr "Todos los derechos reservados"
 
 #: .\venv\Lib\site-packages\django\contrib\messages\apps.py:7
 msgid "Messages"
