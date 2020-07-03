@@ -13,3 +13,7 @@ class CreateReviewForm(forms.ModelForm):
             "check_in",
             "value",
         )
+
+    def save(self):
+        review = super().save(commit=False) # database에 저장x
+        return review
