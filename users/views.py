@@ -292,7 +292,7 @@ def switch_host(request):
         request.session["is_hosting"] = True
     return redirect(reverse("core:home"))
 
-#translation
+#translation language
 def switch_language(request):
     lang = request.GET.get("lang",None)
     if lang is not None:

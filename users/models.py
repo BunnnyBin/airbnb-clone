@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 from django.shortcuts import reverse
+from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     """Custom User Model"""
@@ -15,17 +16,17 @@ class User(AbstractUser):
     GENDER_OTHER = "other"
 
     GENDER_CHOICES = (
-        (GENDER_MALE, "Male"),
-        (GENDER_FEMALE, "Female"),
-        (GENDER_OTHER, "Other"),
+        (GENDER_MALE, _("Male")),
+        (GENDER_FEMALE, _("Female")),
+        (GENDER_OTHER, _("Other")),
     )
 
     LANGUAGE_ENGLISH = "en"
     LANGUAGE_KOREAN = "kr"
 
     LANGUAGE_CHOICES = (
-        (LANGUAGE_ENGLISH, "English"),
-        (LANGUAGE_KOREAN, "Korean"),
+        (LANGUAGE_ENGLISH, _("English")),
+        (LANGUAGE_KOREAN, _("Korean")),
     )
 
     CURRENCY_USD = "usd"
@@ -47,8 +48,8 @@ class User(AbstractUser):
     )
 
     avatar = models.ImageField(upload_to="avatars", null=True, blank=True)
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True, blank=True)
-    bio = models.TextField(default="", blank=True)
+    gender = models.CharField(_('gender'), choices=GENDER_CHOICES, max_length=10, null=True, blank=True)
+    bio = models.TextField(_('bio'), default="", blank=True)
     birthdate = models.DateField(null=True)
     language = models.CharField(choices=LANGUAGE_CHOICES, max_length=2, null=True, blank=True, default=LANGUAGE_KOREAN)
     currency = models.CharField(choices=CURRENCY_CHOICES, max_length=3, null=True, blank=True, default=CURRENCY_KRW)
@@ -66,7 +67,7 @@ class User(AbstractUser):
             secret = uuid.uuid4().hex[:20]
             self.email_secret = secret
             html_message = render_to_string("emails/verify_email.html", {'secret':secret})
-            send_mail("Verify Airbnb Account",
+            send_mail(_("Verify Airbnb Account"),
                       strip_tags(html_message), #html 제외한 내용 리턴(text)
                       settings.EMAIL_FROM,
                       [self.email],

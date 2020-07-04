@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-03 18:42+0900\n"
+"POT-Creation-Date: 2020-07-05 00:37+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,13 +22,50 @@ msgstr ""
 msgid "Search by City"
 msgstr "Buscar por Ciudad"
 
-#: .\templates\partial\footer.html:5
+#: .\templates\partial\footer.html:6
 msgid "Please don't copy us."
 msgstr "Por favor no nos copies."
 
-#: .\templates\partial\footer.html:7
+#: .\templates\partial\footer.html:8
 msgid "All rights reserved"
 msgstr "Todos los derechos reservados"
+
+#: .\templates\rooms\room_list.html:26
+#, python-format
+msgid "Page %(current_page)s of %(total_pages)s"
+msgstr "Página %(current_page)s de %(total_pages)s"
+
+#: .\users\models.py:19
+msgid "Male"
+msgstr "Hombre"
+
+#: .\users\models.py:20
+msgid "Female"
+msgstr "Mujer"
+
+#: .\users\models.py:21
+msgid "Other"
+msgstr "Otro"
+
+#: .\users\models.py:28
+msgid "English"
+msgstr "Inglés"
+
+#: .\users\models.py:29
+msgid "Korean"
+msgstr "Coreano"
+
+#: .\users\models.py:51
+msgid "gender"
+msgstr "género"
+
+#: .\users\models.py:52
+msgid "bio"
+msgstr "biografía"
+
+#: .\users\models.py:70
+msgid "Verify Airbnb Account"
+msgstr "Verificar Cuenta de Airbnb"
 
 #: .\venv\Lib\site-packages\django\contrib\messages\apps.py:7
 msgid "Messages"
