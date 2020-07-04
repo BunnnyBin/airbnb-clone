@@ -11,6 +11,7 @@ from . import forms, models, mixins
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
+from django.utils import translation
 
 # class LoginView(View):
 #     def get(self, request):  # function : if request.method == "GET"
@@ -295,5 +296,5 @@ def switch_host(request):
 def switch_language(request):
     lang = request.GET.get("lang",None)
     if lang is not None:
-        pass
+        request.session[translation.LANGUAGE_SESSION_KEY] = lang
     return HttpResponse(status=200)
